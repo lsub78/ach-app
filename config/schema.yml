@@ -1,0 +1,141 @@
+# ACH configuration contract. Every configurable property must be declared here.
+application: ach
+properties:
+
+  # ---- Tenant business behaviour (TENANT: identical in every environment of a tenant)
+  ach.cutoffTime:
+    type: LocalTime
+    scope: TENANT
+    reload: DYNAMIC
+    default: "17:00"
+    required: true
+    description: Daily ACH submission cutoff (bank local time)
+  ach.sameDayEnabled:
+    type: Boolean
+    scope: TENANT
+    reload: DYNAMIC
+    description: Same-day ACH enabled
+  ach.maxTransactionAmount:
+    type: Decimal
+    scope: TENANT
+    reload: DYNAMIC
+    min: 1
+    max: 100000000
+    description: Maximum single transaction amount (USD)
+  ach.returnWindowDays:
+    type: Integer
+    scope: TENANT
+    reload: DYNAMIC
+    min: 1
+    max: 60
+    description: Days within which returns are accepted
+  ach.processing.threadPoolSize:
+    type: Integer
+    scope: TENANT
+    reload: RESTART_REQUIRED
+    min: 1
+    max: 64
+    description: Dedicated worker threads per tenant (resized only on restart)
+
+  # ---- Shared per stage (TENANT_STAGE: may be set per tenant or per tenant stage)
+  ach.integration.timeout:
+    type: Duration
+    scope: TENANT_STAGE
+    reload: DYNAMIC
+    description: Timeout for calls to the bank's core and SFTP systems
+  ach.integration.simulationMode:
+    type: Boolean
+    scope: TENANT_STAGE
+    reload: DYNAMIC
+    description: Use simulated core responses
+
+  # ---- Integration differences (TENANT_ENVIRONMENT)
+  ach.core.endpoint:
+    type: URI
+    scope: TENANT_ENVIRONMENT
+    reload: DYNAMIC
+    required: true
+    description: Bank core banking endpoint for this environment
+  ach.sftp.host:
+    type: String
+    scope: TENANT_ENVIRONMENT
+    reload: DYNAMIC
+    pattern: "[a-z0-9.-]+"
+  ach.sftp.credentialRef:
+    type: SecretRef
+    scope: TENANT_ENVIRONMENT
+    reload: DYNAMIC
+
+  # ---- Tenant extensions: typed, owned by one tenant
+  extensions.mcb.ach.memoPostingEnabled:
+    type: Boolean
+    scope: TENANT
+    reload: DYNAMIC
+    tenants: [MCB]
+  extensions.mcb.ach.settlementAccount:
+    type: String
+    scope: TENANT
+    reload: DYNAMIC
+    tenants: [MCB]
+    pattern: "ACH-MCB-\\d{3}"
+    sensitive: true
+
+  # ---- Runtime cell infrastructure (CELL: owned by DevOps, restart required)
+  database.jdbcUrl:
+    type: URI
+    scope: CELL
+    reload: RESTART_REQUIRED
+    required: true
+  database.credentialRef:
+    type: SecretRef
+    scope: CELL
+    reload: RESTART_REQUIRED
+  messaging.kafka.bootstrapServers:
+    type: String
+    scope: CELL
+    reload: RESTART_REQUIRED
+    required: true
+  messaging.mq.endpoint:
+    type: String
+    scope: CELL
+    reload: RESTART_REQUIRED
+  cache.redis.endpoint:
+    type: String
+    scope: CELL
+    reload: RESTART_REQUIRED
+
+  # ---- Application-wide (APPLICATION: default only, not overridable)
+  server.port:
+    type: Integer
+    scope: APPLICATION
+    reload: RESTART_REQUIRED
+    min: 1
+    max: 65535
+  extensions.frost.ach.memoPostingEnabled:
+    type: Boolean
+    scope: TENANT
+    reload: DYNAMIC
+    tenants: [FROST]
+    description: "Extension for FROST"
+  extensions.frost.ach.settlementAccount:
+    type: String
+    scope: TENANT
+    reload: DYNAMIC
+    tenants: [FROST]
+    pattern: "ACH-FROST-[0-9]{3}"
+    sensitive: true
+    description: "Extension for FROST"
+  extensions.fnb.ach.memoPostingEnabled:
+    type: Boolean
+    scope: TENANT
+    reload: DYNAMIC
+    tenants: [FNB]
+    description: "Extension for FNB"
+  extensions.fnb.ach.settlementAccount:
+    type: String
+    scope: TENANT
+    reload: DYNAMIC
+    tenants: [FNB]
+    pattern: "ACH-FNB-[0-9]{3}"
+    sensitive: true
+    description: "Extension for FNB"

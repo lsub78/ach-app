@@ -1,0 +1,14 @@
+# Unless a tenant says otherwise, this is how ACH behaves.
+ach:
+  cutoffTime: "17:00"
+  sameDayEnabled: false
+  maxTransactionAmount: 250000
+  returnWindowDays: 2
+  processing:
+    threadPoolSize: 8
+  integration:
+    timeout: 10s
+    simulationMode: false
+
+server:
+  port: 8080
