@@ -66,20 +66,6 @@ properties:
     scope: TENANT_ENVIRONMENT
     reload: DYNAMIC
 
-  # ---- Tenant extensions: typed, owned by one tenant
-  extensions.mcb.ach.memoPostingEnabled:
-    type: Boolean
-    scope: TENANT
-    reload: DYNAMIC
-    tenants: [MCB]
-  extensions.mcb.ach.settlementAccount:
-    type: String
-    scope: TENANT
-    reload: DYNAMIC
-    tenants: [MCB]
-    pattern: "ACH-MCB-\\d{3}"
-    sensitive: true
-
   # ---- Runtime cell infrastructure (CELL: owned by DevOps, restart required)
   database.jdbcUrl:
     type: URI
@@ -111,31 +97,3 @@ properties:
     reload: RESTART_REQUIRED
     min: 1
     max: 65535
-  extensions.frost.ach.memoPostingEnabled:
-    type: Boolean
-    scope: TENANT
-    reload: DYNAMIC
-    tenants: [FROST]
-    description: "Extension for FROST"
-  extensions.frost.ach.settlementAccount:
-    type: String
-    scope: TENANT
-    reload: DYNAMIC
-    tenants: [FROST]
-    pattern: "ACH-FROST-[0-9]{3}"
-    sensitive: true
-    description: "Extension for FROST"
-  extensions.fnb.ach.memoPostingEnabled:
-    type: Boolean
-    scope: TENANT
-    reload: DYNAMIC
-    tenants: [FNB]
-    description: "Extension for FNB"
-  extensions.fnb.ach.settlementAccount:
-    type: String
-    scope: TENANT
-    reload: DYNAMIC
-    tenants: [FNB]
-    pattern: "ACH-FNB-[0-9]{3}"
-    sensitive: true
-    description: "Extension for FNB"
